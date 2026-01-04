@@ -29,6 +29,9 @@ def create_app(config_name='development'):
     db.init_app(app)
     migrate.init_app(app, db)
     CORS(app)
+     #: Initialize storage service
+    from app.services.storage import init_storage_service
+    init_storage_service(app)
     
     # Register blueprints (routes)
    #  from app.routes.upload import upload_bp
