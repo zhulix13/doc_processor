@@ -71,7 +71,7 @@ def upload_file():
         storage_key = generate_storage_key(file_metadata['filename'])
         
         # 6. Get optional parameters
-        uploaded_by = request.form.get('uploaded_by')
+        uploaded_by = request.form.get('uploaded_by', )
         
         # 7. Create database record (not committed yet)
         document = Document(

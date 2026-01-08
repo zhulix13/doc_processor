@@ -29,17 +29,18 @@ def create_app(config_name='development'):
     db.init_app(app)
     migrate.init_app(app, db)
     CORS(app)
-     #: Initialize storage service
+    
+    # Initialize storage service
     from app.services.storage import init_storage_service
     init_storage_service(app)
     
-    # Register blueprints (routes)
-   #  from app.routes.upload import upload_bp
-   #  from app.routes.jobs import jobs_bp
+    # Register blueprints
+    from app.routes.upload import upload_bp
+    from app.routes.jobs import jobs_bp
+   
     
-   #  app.register_blueprint(upload_bp, url_prefix='/api')
-   #  app.register_blueprint(jobs_bp, url_prefix='/api')
-    
+    app.register_blueprint(upload_bp, url_prefix='/api')
+    app.register_blueprint(jobs_bp, url_prefix='/api')
     # Import models so Flask-Migrate can detect them
     from app.models import Document, ProcessingJob, JobResult
     

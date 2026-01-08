@@ -32,7 +32,7 @@ class Config:
     MINIO_SECURE = os.getenv('MINIO_SECURE', 'False').lower() == 'true'
     
     # Upload Settings
-    MAX_FILE_SIZE = int(os.getenv('MAX_FILE_SIZE', 50 * 1024 * 1024))  # 50MB default
+    MAX_FILE_SIZE = int(50 * 1024 * 1024)  # 50MB default
     ALLOWED_EXTENSIONS = set(os.getenv('ALLOWED_EXTENSIONS', 'pdf,docx,xlsx,csv,jpg,png').split(','))
     UPLOAD_FOLDER = os.getenv('UPLOAD_FOLDER', 'tmp/uploads')
     
