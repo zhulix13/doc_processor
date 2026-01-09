@@ -24,8 +24,9 @@ class ContextTask(celery.Task):
 
 celery.Task = ContextTask
 
-# Import tasks so Celery can discover them
-from app.tasks import pdf_tasks, excel_tasks, csv_tasks
+
+# ✨ Import tasks so Celery can discover them
+from app.tasks.processing_tasks import extract_data_task 
 
 # For debugging
 if __name__ == '__main__':

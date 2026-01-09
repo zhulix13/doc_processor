@@ -1,10 +1,14 @@
 from flask import Blueprint, request, jsonify
+
 from sqlalchemy.exc import SQLAlchemyError
 
 from app import db
 from app.models import Document, ProcessingJob, JobResult
 from app.services.validator import validate_job_type, validate_job_options, ValidationError
 
+import logging
+
+logger = logging.getLogger(__name__)
 jobs_bp = Blueprint('jobs', __name__)
 
 
@@ -66,16 +70,31 @@ def create_job():
         db.session.add(job)
         db.session.commit()
         
-        # 5. TODO: Send job to Celery queue (Phase 3)
-        # from app.tasks import process_document
-        # celery_task = process_document.delay(str(job.id))
-        # job.celery_task_id = celery_task.id
-        # db.session.commit()
+       
+        try:
+            if job_type == 'extract_data':
+                from app.tasks.processing_tasks import extract_data_task
+                celery_task = extract_data_task.delay(str(job.id))
+                
+                # Save Celery task ID
+                job.celery_task_id = celery_task.id
+                db.session.commit()
+                
+                logger.info(f"Queued Celery task {celery_task.id} for job {job.id}")
+            else:
+                # Other job types not implemented yet
+                logger.warning(f"Job type '{job_type}' queued but no task handler available yet")
+        
+        except Exception as celery_error:
+            logger.error(f"Failed to queue Celery task: {celery_error}")
+            # Don't fail the request - job is still created, can retry manually
         
         return jsonify({
-            'message': 'Job created successfully',
+            'message': 'Job created and queued successfully',
             'job': job.to_dict()
         }), 201
+        
+        
         
     except SQLAlchemyError as e:
         db.session.rollback()
