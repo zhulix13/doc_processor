@@ -12,7 +12,7 @@ from io import BytesIO
 from app import db
 from app.models import ProcessingJob, JobResult
 from app.services.storage import get_storage_service
-from app.services.extractors import extract_from_pdf, extract_from_csv, extract_from_excel
+from app.services.extractors import extract_from_pdf, extract_from_csv, extract_from_excel, extract_from_docx,extract_from_image
 
 logger = logging.getLogger(__name__)
 
@@ -62,6 +62,11 @@ def extract_data_task(self, job_id):
             results = extract_from_csv(file_data)
         elif mime_type in ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel']:
             results = extract_from_excel(file_data)
+        elif mime_type == 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':  # NEW
+            results = extract_from_docx(file_data)
+        elif mime_type in ['image/jpeg', 'image/png']: 
+            # Pass job options to OCR (for language selection)
+            results = extract_from_image(file_data, job.options_)
         else:
             raise ValueError(f"Unsupported file type: {mime_type}")
         

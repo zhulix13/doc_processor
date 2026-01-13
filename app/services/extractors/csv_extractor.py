@@ -4,6 +4,7 @@ Extracts tabular data from CSV files.
 """
 
 import pandas as pd
+import numpy as np  
 from io import BytesIO
 import logging
 
@@ -19,17 +20,6 @@ def extract_from_csv(file_data):
     
     Returns:
         dict: Extracted data
-            {
-                'extracted_tables': {
-                    'tables': list,
-                    'table_count': int,
-                    'row_count': int,
-                    'column_count': int
-                }
-            }
-    
-    Raises:
-        Exception: If CSV cannot be processed
     """
     results = {}
     
@@ -49,12 +39,15 @@ def extract_from_csv(file_data):
         if df is None:
             raise Exception("Failed to decode CSV with any encoding")
         
+        # ✨ NEW: Replace NaN with None (null in JSON)
+        df = df.replace({np.nan: None})
+        
         # Convert to table format
         table_data = {
             'page': 1,
             'table_number': 1,
             'columns': df.columns.tolist(),
-            'data': df.values.tolist(),
+            'data': df.values.tolist(),  # ← NaN now converted to None
             'row_count': len(df),
             'column_count': len(df.columns)
         }
@@ -73,7 +66,7 @@ def extract_from_csv(file_data):
                 'numeric_columns': numeric_cols,
                 'total_rows': len(df),
                 'total_columns': len(df.columns),
-                'has_header': True  # Assuming first row is header
+                'has_header': True
             }
         
         logger.info(f"Successfully extracted CSV: {len(df)} rows, {len(df.columns)} columns")

@@ -72,7 +72,7 @@ def create_job():
         
        
         try:
-            if job_type == 'extract_data':
+            if str(job_type) == 'extract_data':
                 from app.tasks.processing_tasks import extract_data_task
                 celery_task = extract_data_task.delay(str(job.id))
                 
@@ -351,6 +351,21 @@ def retry_job(job_id):
         db.session.commit()
         
         # TODO: Send to Celery (Phase 3)
+        try:
+            if str(new_job.job_type) == 'extract_data':
+                from app.tasks.processing_tasks import extract_data_task
+                celery_task = extract_data_task.delay(str(new_job.id))
+                
+                # Save Celery task ID
+                new_job.celery_task_id = celery_task.id
+                db.session.commit()
+                
+                logger.info(f"Queued Celery task {celery_task.id} for retried job {new_job.id}")
+            else:
+                logger.warning(f"Job type '{new_job.job_type}' queued but no task handler available yet")
+        except Exception as celery_error:
+            logger.error(f"Failed to queue Celery task for retried job: {celery_error}")
+            # Don't fail the request - job is still created, can retry manually       
         
         return jsonify({
             'message': 'Job retry created',

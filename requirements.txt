@@ -18,6 +18,8 @@ pandas==2.1.4
 openpyxl==3.1.2
 Pillow==10.1.0
 python-magic-bin==0.4.14  # Windows
+python-docx==1.1.0
+pytesseract==0.3.10
 
 # Storage
 minio==7.2.0

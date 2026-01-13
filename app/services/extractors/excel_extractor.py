@@ -6,6 +6,7 @@ Extracts tabular data from Excel files (.xlsx, .xls).
 import pandas as pd
 from io import BytesIO
 import logging
+import numpy as np
 
 logger = logging.getLogger(__name__)
 
@@ -52,6 +53,8 @@ def extract_from_excel(file_data):
                     logger.warning(f"Sheet '{sheet_name}' is empty, skipping")
                     continue
                 
+                # Replace NaN with None (null in JSON)
+                df = df.replace({np.nan: None})
                 table_data = {
                     'page': sheet_num,
                     'sheet_name': sheet_name,
