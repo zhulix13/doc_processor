@@ -9,30 +9,30 @@ class Config:
     """Base configuration - shared across all environments"""
     
     # Flask Core
-    SECRET_KEY = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-production')
+    SECRET_KEY = os.getenv('SECRET_KEY', 'dona@hotboy123')
     
     # SQLAlchemy
     SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
-    SQLALCHEMY_TRACK_MODIFICATIONS = False  # Disable Flask-SQLAlchemy event system (saves resources)
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ENGINE_OPTIONS = {
         'pool_size': 10,
         'pool_recycle': 3600,
-        'pool_pre_ping': True,  # Verify connections before using
+        'pool_pre_ping': True,
     }
     
-    # Celery
+    # Celery - UPDATED to use Redis
     CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL')
     CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND')
     
-    # MinIO
-    MINIO_ENDPOINT = os.getenv('MINIO_ENDPOINT', 'localhost:9000')
+    # MinIO/R2
+    MINIO_ENDPOINT = os.getenv('MINIO_ENDPOINT')
     MINIO_ACCESS_KEY = os.getenv('MINIO_ACCESS_KEY')
     MINIO_SECRET_KEY = os.getenv('MINIO_SECRET_KEY')
     MINIO_BUCKET = os.getenv('MINIO_BUCKET', 'documents')
-    MINIO_SECURE = os.getenv('MINIO_SECURE', 'False').lower() == 'true'
+    MINIO_SECURE = os.getenv('MINIO_SECURE', 'True').lower() == 'true'
     
     # Upload Settings
-    MAX_FILE_SIZE = int(50 * 1024 * 1024)  # 50MB default
+    MAX_FILE_SIZE = int(os.getenv('MAX_FILE_SIZE', 50 * 1024 * 1024))
     ALLOWED_EXTENSIONS = set(os.getenv('ALLOWED_EXTENSIONS', 'pdf,docx,xlsx,csv,jpg,png').split(','))
     UPLOAD_FOLDER = os.getenv('UPLOAD_FOLDER', 'tmp/uploads')
     
@@ -74,8 +74,11 @@ class ProductionConfig(Config):
         'pool_size': 20,
         'pool_recycle': 3600,
         'pool_pre_ping': True,
-        'echo': False,  # Don't log SQL queries
+        'echo': False,
     }
+    
+    # Production CORS - UPDATE with your frontend URL
+    CORS_ORIGINS = os.getenv('CORS_ORIGINS', '*').split(',')
 
 
 class TestingConfig(Config):

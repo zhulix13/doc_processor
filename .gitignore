@@ -13,6 +13,8 @@ instance/
 
 # Environment
 .env
+.env.production
+.env.local
 
 # Temp files
 temp_uploads/
